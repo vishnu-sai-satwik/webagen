@@ -202,12 +202,14 @@ export default function Home() {
   ]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Prevent background scrolling when a modal is open
+  // Prevent background scrolling when a modal is open AND disable custom cursor
   useEffect(() => {
     if (activeModal || isAiChatOpen) {
       document.body.style.overflow = 'hidden';
+      document.body.classList.add('modal-open');
     } else {
       document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
     }
   }, [activeModal, isAiChatOpen]);
 
@@ -315,6 +317,10 @@ export default function Home() {
     const transitionTimeout = setTimeout(() => {
       document.documentElement.classList.remove('no-transitions');
       document.body.classList.remove('no-transitions');
+      
+      // CRITICAL FIX: Remove the hardcoded inline style applied by the FOUC script 
+      // so that our CSS variables can correctly manage the light/dark background.
+      document.documentElement.style.backgroundColor = '';
     }, 50);
 
     return () => clearTimeout(transitionTimeout);
@@ -344,6 +350,9 @@ export default function Home() {
     const ring = document.getElementById("cursorRing");
 
     const handleMouseMove = (e: MouseEvent) => {
+      // Disable custom cursor movement logic if a modal is open to prevent performance issues
+      if (document.body.classList.contains('modal-open')) return;
+      
       if (cursor) {
         cursor.style.left = e.clientX + "px";
         cursor.style.top = e.clientY + "px";
@@ -490,8 +499,13 @@ export default function Home() {
 
     .no-transitions * { transition: none !important; }
 
-    html { scroll-behavior: smooth; background-color: var(--bg); transition: background-color 0.4s ease; }
-    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; cursor:none; transition:background 0.4s ease, color 0.4s ease; }
+    /* CRITICAL MOBILE FIXES: Set strict max-width and hidden horizontal overflow on both HTML and Body to prevent zoom-out */
+    html { scroll-behavior: smooth; background-color: var(--bg); transition: background-color 0.4s ease; max-width: 100vw; overflow-x: hidden; }
+    body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; cursor:none; transition:background 0.4s ease, color 0.4s ease; max-width: 100vw; }
+
+    /* MODAL OPEN CURSOR FIX: Re-enable default cursor when a modal is open so users can interact with iframes */
+    body.modal-open, body.modal-open * { cursor: auto !important; }
+    body.modal-open .cursor, body.modal-open .cursor-ring { display: none !important; opacity: 0 !important; }
 
     .scroll-progress {
       position: fixed; top: 0; left: 0; height: 3px; background: var(--indigo);
@@ -793,7 +807,7 @@ export default function Home() {
     @keyframes loadBar { 0% { width: 0%; } 20% { width: 45%; } 50% { width: 78%; } 80% { width: 100%; } 100% { width: 100%; } }
     @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     
-    .cp-terminal { background: #050505; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; display: flex; flex-direction: column; gap: 10px; position: relative; height: 170px; }
+    .cp-terminal { background: #050505; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 20px; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12px; display: flex; flex-direction: column; gap: 10px; position: relative; height: 170px; overflow-x: hidden; }
     .cp-terminal::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, #050505, transparent); pointer-events: none; }
     
     .log-line { display: flex; gap: 12px; opacity: 0; animation: fadeLog 10s infinite; }
@@ -973,6 +987,20 @@ export default function Home() {
       z-index: 1;
     }
 
+    /* FOUNDER SECTION */
+    .founder { padding: 110px 52px; background: var(--bg); transition: background 0.3s; }
+    .founder-container { max-width: 1160px; margin: 0 auto; display: grid; grid-template-columns: 0.8fr 1.2fr; gap: 64px; align-items: center; background: var(--card-bg); border: 0.5px solid var(--border); border-radius: 32px; padding: 64px; box-shadow: 0 24px 80px var(--card-shadow); transition: background 0.3s, border-color 0.3s; }
+    .founder-image-col { position: relative; }
+    .founder-image-wrap { position: relative; border-radius: 24px; overflow: hidden; aspect-ratio: 4/5; z-index: 2; border: 1px solid var(--border); background: var(--bg-alt); }
+    .founder-image-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(20%) contrast(110%); transition: filter 0.4s; }
+    .founder-image-wrap:hover img { filter: grayscale(0%) contrast(100%); }
+    .founder-glow { position: absolute; inset: -20px; background: radial-gradient(circle, var(--indigo-glow) 0%, transparent 70%); z-index: 1; filter: blur(30px); }
+    .founder-text-col { display: flex; flex-direction: column; align-items: flex-start; }
+    .founder-desc { font-size: 16px; color: var(--text-muted); line-height: 1.8; margin-bottom: 24px; }
+    .founder-stats { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .f-stat { background: var(--bg-alt); border: 1px solid var(--border); padding: 16px 24px; border-radius: 16px; font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; transition: background 0.3s, border-color 0.3s; }
+    .f-stat span { font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: var(--text); letter-spacing: -0.02em; transition: color 0.3s; }
+
     /* FAQ */
     .faq{padding:110px 52px;background:var(--bg-alt);transition:background 0.3s;}
     .faq-header-wrap { max-width: 1160px; margin: 0 auto 54px; text-align: left; display: flex; flex-direction: column; align-items: flex-start; }
@@ -984,8 +1012,14 @@ export default function Home() {
     .faq-q{font-family:'Inter',sans-serif;font-size:18px;font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;color:var(--text);transition:color 0.3s;}
     .faq-a{font-size:15px;color:var(--text-muted);line-height:1.75;transition:color 0.3s;}
 
+    /* BOOKING SECTION */
+    .booking { padding: 110px 52px; background: var(--bg); transition: background 0.3s; }
+    .booking-container { max-width: 1040px; margin: 0 auto; background: var(--card-bg); border: 0.5px solid var(--border); border-radius: 24px; padding: 40px; box-shadow: 0 24px 80px var(--card-shadow); transition: background 0.3s, border-color 0.3s; }
+    .booking-iframe { width: 100%; height: 700px; border: none; border-radius: 12px; }
+    [data-theme="dark"] .booking-container { box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+
     /* CTA FINAL */
-    .cta-final{padding:100px 52px 24px;background:#050505;text-align:center;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;min-height:85vh; border-radius: 64px 64px 0 0; border-top: 1px solid rgba(255,255,255,0.08); box-shadow: 0 -20px 80px rgba(0,0,0,0.3); z-index: 20; margin-top: 80px;}
+    .cta-final{padding:100px 52px 24px;background:#050505;text-align:center;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;min-height:85vh; border-radius: 64px 64px 0 0; border-top: 1px solid rgba(255,255,255,0.08); box-shadow: 0 -20px 80px rgba(0,0,0,0.3); z-index: 20;}
     .cta-dots-bg{position:absolute;inset:0;opacity:0.35;background-image:radial-gradient(rgba(255,255,255,1) 1px,transparent 1px);background-size:40px 40px;-webkit-mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,#000 30%,transparent 100%);mask-image:radial-gradient(ellipse 60% 60% at 50% 50%,#000 30%,transparent 100%);pointer-events:none;z-index:1;}
     .cta-bg-glow{position:absolute;width:800px;height:800px;border-radius:50%;background:radial-gradient(circle,rgba(99,102,241,0.12) 0%,transparent 60%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:2;}
     
@@ -1066,7 +1100,8 @@ export default function Home() {
     
     .chat-win-footer { padding: 16px 20px; background: var(--bg-alt); border-top: 1px solid var(--border); }
     .chat-input-form { display: flex; gap: 8px; position: relative; }
-    .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 100px; padding: 14px 20px; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif; }
+    /* MOBILE ZOOM FIX: font-size must be 16px on iOS to prevent automatic zoom-in when tapping an input */
+    .chat-input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 100px; padding: 14px 20px; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.2s; font-family: 'Inter', sans-serif; }
     .chat-input:focus { border-color: var(--indigo); }
     .chat-send-btn { width: 46px; height: 46px; border-radius: 50%; background: var(--indigo); color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: none; transition: transform 0.2s, background 0.2s; flex-shrink: 0; }
     .chat-send-btn:hover { background: var(--indigo-mid); transform: scale(1.05); }
@@ -1076,7 +1111,7 @@ export default function Home() {
     .scroll-hint{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:56px;animation:riseIn 1s 1s ease both;}
     .scroll-line{width:1px;height:44px;background:linear-gradient(to bottom,var(--indigo),transparent);animation:scrollAnim 2s ease-in-out infinite;}
     @keyframes scrollAnim{0%,100%{opacity:0.3;transform:scaleY(1);}50%{opacity:1;transform:scaleY(1.1);}}
-    .scroll-txt{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gray-light);}
+    .scroll-txt{font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-light);}
 
     @keyframes riseIn{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
 
@@ -1098,7 +1133,7 @@ export default function Home() {
 
     /* RESPONSIVE ADJUSTMENTS */
     @media (max-width: 1024px) {
-      .services, .portfolio, .process, .pricing, .trust, .faq { padding: 80px 32px; }
+      .services, .portfolio, .process, .pricing, .trust, .faq, .founder, .booking { padding: 80px 32px; }
       .services-grid, .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
       .pricing-grid { grid-template-columns: repeat(2, 1fr); }
       .process-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -1113,7 +1148,13 @@ export default function Home() {
     }
 
     @media (max-width: 768px) {
-      .services, .portfolio, .process, .pricing, .trust, .faq { padding: 60px 24px; }
+      /* MOBILE CURSOR FIX: Disable custom cursor natively on mobile */
+      .cursor, .cursor-ring { display: none !important; }
+      *, body, a, button { cursor: auto !important; }
+
+      .services, .portfolio, .process, .pricing, .trust, .faq, .founder, .booking { padding: 60px 24px; }
+      .booking-container { padding: 20px; }
+      .booking-iframe { height: 600px; }
       .hero { padding: 120px 24px 80px; }
       .hero-ctas { flex-direction: column; width: 100%; max-width: 320px; margin-left: auto; margin-right: auto; gap: 16px; }
       .btn-primary, .btn-secondary { width: 100%; justify-content: center; padding: 16px; }
@@ -1142,6 +1183,9 @@ export default function Home() {
       .laptop-base { height: 16px; border-radius: 0 0 4px 4px; }
       .laptop-foot { margin: 0 40px; height: 6px; }
       
+      .founder-container { grid-template-columns: 1fr; padding: 32px 24px; gap: 40px; }
+      .founder-image-wrap { aspect-ratio: 1/1; max-width: 320px; margin: 0 auto; }
+
       .cta-final { padding: 80px 24px 32px; border-radius: 32px 32px 0 0; margin-top: 40px; }
       .cta-title { font-size: 32px !important; margin-bottom: 32px; }
       .cta-footer { margin-top: 40px; padding-top: 40px; }
@@ -1150,7 +1194,29 @@ export default function Home() {
       .ai-fab { bottom: 24px; right: 24px; width: 56px; height: 56px; }
       .chat-window { position: fixed; inset: 0; width: 100%; height: 100%; max-height: 100%; border-radius: 0; z-index: 10000; transform: translateY(100%); }
       .chat-window.open { transform: translateY(0); }
-      .modal-content.contact-modal { border-radius: 0; min-height: 100vh; }
+
+      /* FULL SCREEN CONTACT MODAL MOBILE FIX */
+      .modal-content.contact-modal { 
+         position: fixed; 
+         inset: 0; 
+         width: 100vw; 
+         height: 100dvh; 
+         max-width: 100vw; 
+         max-height: 100dvh; 
+         border-radius: 0; 
+         border: none; 
+         margin: 0; 
+         display: block; 
+         overflow-y: auto; 
+         -webkit-overflow-scrolling: touch; 
+      }
+      .contact-grid { display: flex; flex-direction: column; }
+      .contact-left { padding: 32px 20px; border-bottom: 1px solid var(--border); }
+      .contact-right { flex: 1; min-height: 600px; width: 100%; }
+      .contact-right iframe { height: 100%; width: 100%; min-height: 650px; }
+      .modal-close { top: 16px; right: 16px; position: fixed; background: var(--card-highlight); color: #fff; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+      
+      .chat-input { font-size: 16px !important; }
     }
 
     @media (max-width: 480px) {
@@ -1160,12 +1226,14 @@ export default function Home() {
       .process-step { flex-direction: column; gap: 12px; padding: 24px 20px;}
       .compare-col { padding: 40px 24px; }
       .port-visual { height: 200px; }
-      .contact-left { padding: 32px 20px; }
     }
   `;
 
   return (
     <main>
+      {/* MOBILE ZOOM FIX: Crucial meta viewport tag to prevent mobile screens from zooming out */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+      
       {/* SEO & Meta Data */}
       <title>WebAgen Studio | AI-Powered Web Development India</title>
       <meta name="description" content="Stop paying for slow, outdated WordPress sites. We build modern, high-performance Next.js websites powered by custom AI agents and smart analytics in 7 days." />
@@ -1305,7 +1373,7 @@ export default function Home() {
           </a>
         </div>
 
-        {/* MASSIVE FIXED LAPTOP MOCKUP WITH HINGE */}
+        {/* MASSIVE FIXED LAPTOP MOCKUP WITH HINGE ANIMATION */}
         <div id="laptop-mockup" className="laptop-wrapper" style={{ perspective: "1200px" }} aria-hidden="true">
           <div className={`laptop-screen-wrap ${laptopOpen ? 'open' : 'closed'}`}>
             <div className="laptop-outer">
@@ -1863,7 +1931,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* US VS THEM (Replaced Fake Reviews) */}
+      {/* TRUST (US VS THEM) */}
       <section className="trust" id="trust">
         <div style={{ maxWidth: '1160px', margin: '0 auto', textAlign: 'center', marginBottom: '54px' }}>
           <div className="sec-eyebrow reveal-up" style={{ justifyContent: 'center' }}>Why WebAgen</div>
@@ -1929,6 +1997,33 @@ export default function Home() {
                 <span><strong>Technical SEO</strong> & Core Web Vitals included</span>
               </li>
             </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* FOUNDER SECTION */}
+      <section className="founder" id="founder">
+        <div className="founder-container reveal-up">
+          <div className="founder-image-col">
+            <div className="founder-image-wrap">
+              {/* Note: Update the src path below to match where you save the image in your public folder */}
+              <img src="/profile.png" alt="Vishnu Sai Satwik - Founder & Lead Engineer" />
+              <div className="founder-glow"></div>
+            </div>
+          </div>
+          <div className="founder-text-col">
+            <div className="sec-eyebrow">The Founder</div>
+            <h2 className="sec-title" style={{ marginBottom: '24px' }}>Hi, I'm Vishnu.</h2>
+            <p className="founder-desc">
+              I'm a software engineer and the architect behind platforms like Eduvo AI and FlashCard Engine. I started WebAgen Studio because I saw too many businesses settling for slow, outdated websites that did nothing for their growth.
+            </p>
+            <p className="founder-desc">
+              When you partner with us, you work directly with me and a dedicated team of developers. We combine modern frameworks like Next.js with custom AI integrations to build digital engines that actively capture leads and scale your revenue.
+            </p>
+            <div className="founder-stats">
+              <div className="f-stat"><span>Lead</span> Full-Stack Engineer</div>
+              <div className="f-stat"><span>3</span> SaaS Platforms Built</div>
+            </div>
           </div>
         </div>
       </section>
@@ -2000,6 +2095,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* BOOK A CALL */}
+      <section className="booking" id="book">
+        <div className="faq-header-wrap reveal-up" style={{ textAlign: 'center', alignItems: 'center' }}>
+          <div className="sec-eyebrow" style={{ justifyContent: 'center' }}>Let's Talk</div>
+          <h2 className="sec-title" style={{ maxWidth: 'none' }}>Book Your Free Discovery Call.</h2>
+          <div className="sec-sub" style={{ margin: '16px auto 0', maxWidth: '600px' }}>
+            Find a time that works for you. No pressure, just a transparent conversation about scaling your business.
+          </div>
+        </div>
+        <div className="booking-container reveal-scale">
+          <iframe 
+            src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
+            className="booking-iframe"
+            title="Schedule a Discovery Call"
+          ></iframe>
+        </div>
+      </section>
+
       {/* CTA FINAL & FOOTER */}
       <footer className="cta-final">
         <div className="cta-dots-bg" aria-hidden="true"></div>
@@ -2015,9 +2128,9 @@ export default function Home() {
             className="cta-btns reveal-up"
             style={{ transitionDelay: "0.1s" }}
           >
-            <button onClick={() => setActiveModal('contact')} className="cta-btn-main" aria-label="Open Contact Command Center">
+            <a href="#book" className="cta-btn-main" aria-label="Book Discovery Call">
               Book Discovery Call
-            </button>
+            </a>
           </div>
 
           <div
@@ -2122,27 +2235,27 @@ export default function Home() {
                   <h2 className="modal-header" style={{ fontSize: '32px', marginBottom: '40px' }}>Let's Scale Your Business.</h2>
                   
                   <div className="modal-body" style={{ gap: '16px' }}>
-                    <a href="mailto:your-email@webagen.dev" className="contact-item">
+                    <a href="mailto:company@webagen.dev" className="contact-item">
                       <div className="contact-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                       </div>
                       <div>
                         <div className="contact-info-title">Email Us</div>
-                        <div className="contact-info-value">your-email@webagen.dev</div>
+                        <div className="contact-info-value">company@webagen.dev</div>
                       </div>
                     </a>
 
-                    <a href="tel:+910000000000" className="contact-item">
+                    <a href="tel:+916309847855" className="contact-item">
                       <div className="contact-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                       </div>
                       <div>
                         <div className="contact-info-title">Call Directly</div>
-                        <div className="contact-info-value">+91 00000 00000</div>
+                        <div className="contact-info-value">+91 63098 47855</div>
                       </div>
                     </a>
 
-                    <a href="https://wa.me/910000000000" target="_blank" rel="noreferrer" className="contact-item">
+                    <a href="https://wa.me/916309847855" target="_blank" rel="noreferrer" className="contact-item">
                       <div className="contact-icon" style={{ background: 'rgba(37,211,102,0.1)', color: '#25D366' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                       </div>
@@ -2154,10 +2267,8 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="contact-right">
-                  {/* CAL.COM EMBED PLACEHOLDER */}
-                  {/* Replace this iframe src with your actual cal.com link once created, e.g., https://cal.com/yourname/30min */}
                   <iframe 
-                    src="https://cal.com/" 
+                    src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
                     title="Schedule a Discovery Call"
                   ></iframe>
                 </div>
