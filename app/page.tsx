@@ -2155,10 +2155,9 @@ export default function Home() {
             </div>
             <div className="cta-footer-links">
               <button onClick={() => setActiveModal('privacy')} aria-label="View Privacy Policy">Privacy Policy</button>
-              <button onClick={() => setActiveModal('terms')} aria-label="View Terms and Conditions">Terms & Conditions</button>
-              <a href="#" aria-label="Visit our Twitter profile">Twitter</a>
-              <a href="#" aria-label="Visit our LinkedIn profile">LinkedIn</a>
-              <a href="#" aria-label="Visit our Instagram profile">Instagram</a>
+              <button onClick={() => setActiveModal('terms')} aria-label="View Terms and Conditions">Terms & Conditions</button> 
+              <a href="https://www.linkedin.com/company/webagen" aria-label="Visit our LinkedIn profile">LinkedIn</a>
+              <a href="https://www.instagram.com/webagen7/" aria-label="Visit our Instagram profile">Instagram</a>
             </div>
           </div>
         </div>
