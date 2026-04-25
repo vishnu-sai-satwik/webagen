@@ -2029,7 +2029,7 @@ export default function Home() {
           <div className="founder-image-col">
             <div className="founder-image-wrap">
               {/* Note: Ensure profile.jpg is inside your public folder */}
-              <img src="/profile.jpg" alt="Vishnu Sai Satwik - Founder & Lead Engineer" loading="lazy" />
+              <img src="/profile.png" alt="Vishnu Sai Satwik - Founder & Lead Engineer" loading="lazy" />
               <div className="founder-glow"></div>
             </div>
           </div>
