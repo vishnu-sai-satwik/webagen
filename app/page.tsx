@@ -2128,7 +2128,7 @@ export default function Home() {
         </div>
         <div className="booking-container reveal-scale">
           <iframe 
-            src={`https://cal.com/vishnu-sai-satwik-um4ebc/15min?theme=${isDark ? 'dark' : 'light'}`} 
+            src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
             className="booking-iframe"
             title="Schedule a Discovery Call"
             loading="lazy"
@@ -2292,7 +2292,7 @@ export default function Home() {
                 </div>
                 <div className="contact-right">
                   <iframe 
-                    src={`https://cal.com/vishnu-sai-satwik-um4ebc/15min?theme=${isDark ? 'dark' : 'light'}`} 
+                    src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
                     title="Schedule a Discovery Call"
                     loading="lazy"
                   ></iframe>
