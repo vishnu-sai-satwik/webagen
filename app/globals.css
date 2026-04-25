@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  /* Crisp, true white for the Hero section */
+  --background: #ffffff;
+  --foreground: #09090b; /* Zinc-950: softer than pure black for readable text */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Pure OLED black for the premium Bento grid aesthetic */
+    --background: #000000; 
+    --foreground: #fafafa; /* Zinc-50: Crisp white text on dark */
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  /* Prioritizes Apple's system font and Inter for the geometric tech look */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    /* Essential for a seamless One-Page Scroll experience */
+    scroll-behavior: smooth; 
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    
+    /* Apple-specific font rendering for ultra-crisp typography */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
