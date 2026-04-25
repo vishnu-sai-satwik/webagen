@@ -1,19 +1,48 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, memo } from "react";
+
+// --- UI COMPONENTS ---
+
+// Premium Custom SVG Logo for WebAgen
+const WebAgenLogo = memo(({ className = "w-8 h-8", shadow = true }: { className?: string, shadow?: boolean }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 32 32" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    style={{ 
+      boxShadow: shadow ? '0 8px 16px rgba(99,102,241,0.25)' : 'none', 
+      borderRadius: '10px',
+      flexShrink: 0
+    }}
+  >
+    <rect width="32" height="32" rx="10" fill="url(#logoGradMain)" />
+    {/* The 'W' Shape */}
+    <path d="M7 14L12 24L16 16L20 24L25 14" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* The 'A' Crossbar */}
+    <path d="M10.5 20H21.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    {/* The AI Node / Spark */}
+    <circle cx="16" cy="8" r="2.5" fill="white" />
+    <defs>
+      <linearGradient id="logoGradMain" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+        <stop stopColor="#818CF8" />
+        <stop offset="1" stopColor="#4338CA" />
+      </linearGradient>
+    </defs>
+  </svg>
+));
+WebAgenLogo.displayName = 'WebAgenLogo';
 
 // Reusable Component for the Live Automated Browser Demo
-const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string, siteLoaded: boolean, urlText: string }) => (
+const MockSiteContent = memo(({ chatState, siteLoaded, urlText }: { chatState: string, siteLoaded: boolean, urlText: string }) => (
   <div className="mock-site-bg" aria-hidden="true">
-    {/* Browser Top Bar */}
     <div className="mock-browser-bar">
       <div className="flex gap-1.5 absolute left-4">
         <div className="w-3 h-3 rounded-full bg-rose-400/90 shadow-inner"></div>
         <div className="w-3 h-3 rounded-full bg-amber-400/90 shadow-inner"></div>
         <div className="w-3 h-3 rounded-full bg-emerald-400/90 shadow-inner"></div>
       </div>
-      
-      {/* URL Address Bar */}
       <div className="mock-url-bar">
         <span className="text-[12px] mr-1.5" style={{ color: "var(--text-light)" }}>🔒</span>
         <span className="text-[14px] font-bold font-mono tracking-tight flex items-center url-typing-text">
@@ -21,15 +50,15 @@ const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string
           {!siteLoaded && <span className="animate-pulse inline-block w-2 h-4 bg-indigo-500 ml-1"></span>}
         </span>
       </div>
-      
-      {/* Loading Progress Bar */}
       <div className={`loading-bar ${urlText === 'webagen.dev' && !siteLoaded ? 'loading' : ''} ${siteLoaded ? 'done' : ''}`}></div>
     </div>
 
-    {/* Actual Website Content (Fades in after URL is typed) */}
     <div className={`mock-site-body ${siteLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000 flex-1 relative flex flex-col`}>
       <div className="mock-nav">
-        <div className="mock-logo">✦ WebAgen</div>
+        <div className="mock-logo">
+          <WebAgenLogo className="w-5 h-5" shadow={false} />
+          WebAgen
+        </div>
         <div className="mock-nav-links">
           <span className="mock-nav-link">Services</span>
           <span className="mock-nav-link">Portfolio</span>
@@ -38,7 +67,6 @@ const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string
         <div className="mock-book-btn">Get Started</div>
       </div>
       
-      {/* The Hero stretches to fill the massive laptop screen */}
       <div className="mock-hero">
         <div className="mock-hero-left">
           <div className="mock-badge-inner">
@@ -57,7 +85,6 @@ const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string
           </div>
         </div>
 
-        {/* NEW CENTRAL 3D CODE BLOCK */}
         <div className="mock-hero-center">
           <div className="mock-code-wrapper">
             <div className="mock-code-glow"></div>
@@ -101,7 +128,6 @@ const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string
           </div>
         </div>
 
-        {/* LIVE TYPING AI CHATBOT */}
         <div className={`mock-chat ${chatState === 'hidden' ? 'hidden' : ''}`}>
           <div className="mock-chat-header">
             <div className="mock-chat-avatar">AI</div>
@@ -176,7 +202,10 @@ const MockSiteContent = ({ chatState, siteLoaded, urlText }: { chatState: string
       </div>
     </div>
   </div>
-);
+));
+MockSiteContent.displayName = 'MockSiteContent';
+
+// --- MAIN PAGE COMPONENT ---
 
 export default function Home() {
   const [isDark, setIsDark] = useState(false);
@@ -190,7 +219,7 @@ export default function Home() {
   const [chatState, setChatState] = useState("hidden");
   const targetUrl = "webagen.dev";
 
-  // State for Modals (Privacy, Terms, Contact Command Center)
+  // State for Modals
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
   // States for Custom AI Chatbot
@@ -220,14 +249,10 @@ export default function Home() {
     }
   }, [aiMessages, isBotTyping, isAiChatOpen]);
 
-  // Formatter to clean up raw markdown into safe HTML
   const formatAiMessage = (text: string) => {
     let formattedText = text;
-    // Bold tags
     formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong style="font-weight: 700; color: inherit;">$1</strong>');
-    // Star bullet points
     formattedText = formattedText.replace(/^\* (.*$)/gim, '• $1');
-    // Newlines to breaks
     formattedText = formattedText.replace(/\n/g, '<br/>');
     return { __html: formattedText };
   };
@@ -244,13 +269,11 @@ export default function Home() {
     setIsBotTyping(true);
 
     try {
-      // Calling the production backend API route
       const response = await fetch('/api/chat', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: newMessages })
       });
-
       const data = await response.json();
 
       if (response.ok && data.reply) {
@@ -272,14 +295,12 @@ export default function Home() {
 
     if (demoTriggered && !siteLoaded) {
       let i = 0;
-      // Wait for laptop hinge animation (1.5s) to mostly finish before typing starts
       const typingStartTimeout = setTimeout(() => {
         typeInterval = setInterval(() => {
           setUrlText(targetUrl.substring(0, i + 1));
           i++;
           if (i >= targetUrl.length) {
             clearInterval(typeInterval);
-            // After typing finishes, trigger the site load fade-in
             finishTimeout = setTimeout(() => setSiteLoaded(true), 400);
           }
         }, 70); 
@@ -309,17 +330,12 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
-    // Read the theme that was set by our blocking script in the HTML
     const currentTheme = document.documentElement.getAttribute("data-theme");
     setIsDark(currentTheme === "dark");
 
-    // Remove the blocking no-transitions class shortly after hydration
     const transitionTimeout = setTimeout(() => {
       document.documentElement.classList.remove('no-transitions');
       document.body.classList.remove('no-transitions');
-      
-      // CRITICAL FIX: Remove the hardcoded inline style applied by the FOUC script 
-      // so that our CSS variables can correctly manage the light/dark background.
       document.documentElement.style.backgroundColor = '';
     }, 50);
 
@@ -334,40 +350,38 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Top Scroll Progress Bar Logic
+    let ticking = false;
     const handleScrollProgress = () => {
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scrolled = (winScroll / height) * 100;
-      const progressBar = document.getElementById("scrollProgress");
-      if (progressBar) progressBar.style.width = scrolled + "%";
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const scrolled = (winScroll / height) * 100;
+          const progressBar = document.getElementById("scrollProgress");
+          if (progressBar) progressBar.style.width = scrolled + "%";
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
+    window.addEventListener("scroll", handleScrollProgress, { passive: true });
 
-    window.addEventListener("scroll", handleScrollProgress);
-
-    // Custom Cursor Logic
+    // Highly optimized custom cursor utilizing direct CSS transforms without setTimeouts
     const cursor = document.getElementById("cursor");
     const ring = document.getElementById("cursorRing");
 
     const handleMouseMove = (e: MouseEvent) => {
-      // Disable custom cursor movement logic if a modal is open to prevent performance issues
       if (document.body.classList.contains('modal-open')) return;
-      
-      if (cursor) {
+      if (cursor && ring) {
         cursor.style.left = e.clientX + "px";
         cursor.style.top = e.clientY + "px";
+        ring.style.left = e.clientX + "px";
+        ring.style.top = e.clientY + "px";
       }
-      setTimeout(() => {
-        if (ring) {
-          ring.style.left = e.clientX + "px";
-          ring.style.top = e.clientY + "px";
-        }
-      }, 60);
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mousemove", handleMouseMove, { passive: true });
 
-    // Cursor Hover Effects (Added portfolio links to interactive elements)
     const interactiveEls = document.querySelectorAll(
       "a, button, .service-card, .faq-item, .p-card, .trust-card, .process-step, .port-card[href]"
     );
@@ -379,13 +393,12 @@ export default function Home() {
       el.addEventListener("mouseleave", handleMouseLeave);
     });
 
-    // Scroll Reveal Intersection Observer (Enhanced for staggering)
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add("visible");
-            observer.unobserve(e.target); // Only animate once
+            observer.unobserve(e.target);
           }
         });
       },
@@ -394,7 +407,6 @@ export default function Home() {
     
     document.querySelectorAll(".reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-up").forEach((el) => observer.observe(el));
 
-    // Intersection Observer to trigger the Laptop Hinge & Typing Demo
     const laptopObserver = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
@@ -409,7 +421,6 @@ export default function Home() {
     const laptopEl = document.getElementById("laptop-mockup");
     if (laptopEl) laptopObserver.observe(laptopEl);
 
-    // Smooth Scrolling for anchor links
     const handleAnchorClick = (e: Event) => {
       const target = e.currentTarget as HTMLAnchorElement;
       const id = target.getAttribute("href")?.slice(1);
@@ -426,7 +437,6 @@ export default function Home() {
       a.addEventListener("click", handleAnchorClick);
     });
 
-    // Cleanup on unmount
     return () => {
       window.removeEventListener("scroll", handleScrollProgress);
       document.removeEventListener("mousemove", handleMouseMove);
@@ -535,9 +545,7 @@ export default function Home() {
     .nav-left{flex:1;display:flex;justify-content:flex-start;}
     .nav-center{display:flex;justify-content:center;}
     .nav-right{flex:1;display:flex;justify-content:flex-end;align-items:center;gap:24px;}
-    .logo{font-family:'Inter',sans-serif;font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--text);display:flex;align-items:center;gap:9px;text-decoration:none;transition:color 0.3s;}
-    .logo-mark{width:26px;height:26px;background:var(--indigo);border-radius:7px;display:flex;align-items:center;justify-content:center;}
-    .logo-mark svg{width:14px;height:14px;fill:white;}
+    .logo{font-family:'Inter',sans-serif;font-weight:800;font-size:22px;letter-spacing:-0.5px;color:var(--text);display:flex;align-items:center;gap:10px;text-decoration:none;transition:color 0.3s;}
     .nav-links{display:flex;gap:32px;list-style:none;align-items:center;}
     .nav-links a{font-size:14px;color:var(--text-muted);text-decoration:none;font-weight:500;letter-spacing:0.1px;transition:color 0.2s;}
     .nav-links a:hover{color:var(--text);}
@@ -624,7 +632,7 @@ export default function Home() {
     .loading-bar.done { opacity: 0; transition: opacity 0.3s ease 0.2s; }
 
     .mock-nav{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:0.5px solid var(--border);transition: border-color 0.3s;}
-    .mock-logo{font-family:'Inter',sans-serif;font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;transition:color 0.3s;}
+    .mock-logo{font-family:'Inter',sans-serif;font-size:15px;font-weight:800;color:var(--text);letter-spacing:-0.3px;transition:color 0.3s; display:flex; align-items:center; gap:8px;}
     .mock-nav-links{display:flex;gap:20px;}
     .mock-nav-link{font-size:11px;color:var(--text-muted);font-weight:500;transition:color 0.3s;}
     .mock-book-btn{background:var(--indigo);color:#FAFAFA;padding:6px 14px;border-radius:100px;font-size:11px;font-weight:600;}
@@ -1226,6 +1234,7 @@ export default function Home() {
       .process-step { flex-direction: column; gap: 12px; padding: 24px 20px;}
       .compare-col { padding: 40px 24px; }
       .port-visual { height: 200px; }
+      .contact-left { padding: 32px 20px; }
     }
   `;
 
@@ -1234,23 +1243,40 @@ export default function Home() {
       {/* MOBILE ZOOM FIX: Crucial meta viewport tag to prevent mobile screens from zooming out */}
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
       
-      {/* SEO & Meta Data */}
-      <title>WebAgen Studio | AI-Powered Web Development India</title>
-      <meta name="description" content="Stop paying for slow, outdated WordPress sites. We build modern, high-performance Next.js websites powered by custom AI agents and smart analytics in 7 days." />
-      <meta property="og:title" content="WebAgen Studio | AI-Powered Web Development India" />
-      <meta property="og:description" content="High-performance Next.js websites powered by custom AI agents and smart analytics. We build digital engines that convert in 7 days." />
-      <meta property="og:type" content="website" />
-      <meta property="og:site_name" content="WebAgen Studio" />
+      {/* JSON-LD Schema for AEO/GEO/SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ProfessionalService",
+            "name": "WebAgen Studio",
+            "url": "https://webagen.dev",
+            "logo": "https://webagen.dev/profile.jpg",
+            "image": "https://webagen.dev/profile.jpg",
+            "description": "High-performance Next.js websites powered by custom AI agents and smart analytics. We build digital engines that convert in 7 days.",
+            "founder": {
+              "@type": "Person",
+              "name": "Vishnu Sai Satwik"
+            },
+            "priceRange": "₹4,999 - ₹12,999+",
+            "areaServed": "India",
+            "telephone": "+91-6309847855",
+            "email": "company@webagen.dev",
+            "knowsAbout": ["AI Web Development", "Next.js", "Web Automation", "SEO", "SaaS Development"]
+          })
+        }}
+      />
 
       {/* Google Analytics 4 (GA4) Base Tag */}
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-K4P27BYNK3"></script>
       <script
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-XXXXXXXXXX');
+            gtag('config', 'G-K4P27BYNK3');
           `,
         }}
       />
@@ -1296,11 +1322,7 @@ export default function Home() {
       <nav>
         <div className="nav-left">
           <a href="#" className="logo">
-            <div className="logo-mark" aria-hidden="true">
-              <svg viewBox="0 0 14 14">
-                <path d="M2 2h4v4H2zM8 2h4v4H8zM2 8h4v4H2zM10 8h2v2h-2zM8 10h2v2H8z" />
-              </svg>
-            </div>
+            <WebAgenLogo />
             WebAgen
           </a>
         </div>
@@ -2006,8 +2028,8 @@ export default function Home() {
         <div className="founder-container reveal-up">
           <div className="founder-image-col">
             <div className="founder-image-wrap">
-              {/* Note: Update the src path below to match where you save the image in your public folder */}
-              <img src="/profile.png" alt="Vishnu Sai Satwik - Founder & Lead Engineer" />
+              {/* Note: Ensure profile.jpg is inside your public folder */}
+              <img src="/profile.jpg" alt="Vishnu Sai Satwik - Founder & Lead Engineer" loading="lazy" />
               <div className="founder-glow"></div>
             </div>
           </div>
@@ -2106,9 +2128,10 @@ export default function Home() {
         </div>
         <div className="booking-container reveal-scale">
           <iframe 
-            src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
+            src={`https://cal.com/vishnu-sai-satwik-um4ebc/15min?theme=${isDark ? 'dark' : 'light'}`} 
             className="booking-iframe"
             title="Schedule a Discovery Call"
+            loading="lazy"
           ></iframe>
         </div>
       </section>
@@ -2150,14 +2173,16 @@ export default function Home() {
         <div className="cta-footer reveal-up" style={{ transitionDelay: "0.3s" }}>
           <div className="cta-footer-divider" aria-hidden="true"></div>
           <div className="cta-footer-bottom">
-            <div style={{ fontFamily: "'Inter', sans-serif" }}>
+            <div style={{ fontFamily: "'Inter', sans-serif", display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <WebAgenLogo className="w-5 h-5" shadow={false} />
               © {new Date().getFullYear()} WebAgen Studio
             </div>
             <div className="cta-footer-links">
               <button onClick={() => setActiveModal('privacy')} aria-label="View Privacy Policy">Privacy Policy</button>
-              <button onClick={() => setActiveModal('terms')} aria-label="View Terms and Conditions">Terms & Conditions</button> 
-              <a href="https://www.linkedin.com/company/webagen" aria-label="Visit our LinkedIn profile">LinkedIn</a>
-              <a href="https://www.instagram.com/webagen7/" aria-label="Visit our Instagram profile">Instagram</a>
+              <button onClick={() => setActiveModal('terms')} aria-label="View Terms and Conditions">Terms & Conditions</button>
+              <a href="#" aria-label="Visit our Twitter profile">Twitter</a>
+              <a href="#" aria-label="Visit our LinkedIn profile">LinkedIn</a>
+              <a href="#" aria-label="Visit our Instagram profile">Instagram</a>
             </div>
           </div>
         </div>
@@ -2254,7 +2279,7 @@ export default function Home() {
                       </div>
                     </a>
 
-                    <a href="https://wa.me/916309847855" target="_blank" rel="noreferrer" className="contact-item">
+                    <a href="https://wa.me/916309847855?text=Hi%20Vishnu!%20I%27m%20interested%20in%20working%20with%20WebAgen%20Studio." target="_blank" rel="noreferrer" className="contact-item">
                       <div className="contact-icon" style={{ background: 'rgba(37,211,102,0.1)', color: '#25D366' }}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
                       </div>
@@ -2267,8 +2292,9 @@ export default function Home() {
                 </div>
                 <div className="contact-right">
                   <iframe 
-                    src={`https://cal.com/vishnu-sai-satwik-um4ebc/30min?theme=${isDark ? 'dark' : 'light'}`} 
+                    src={`https://cal.com/vishnu-sai-satwik-um4ebc/15min?theme=${isDark ? 'dark' : 'light'}`} 
                     title="Schedule a Discovery Call"
+                    loading="lazy"
                   ></iframe>
                 </div>
               </div>
