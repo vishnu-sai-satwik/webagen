@@ -1350,7 +1350,7 @@ export default function Home() {
         <div className="nav-right">
           <button onClick={toggleTheme} className="theme-toggle" aria-label="Toggle Dark Mode">
             {!mounted ? (
-               <div style={{ width: 20, height: 20 }}></div>
+                <div style={{ width: 20, height: 20 }}></div>
             ) : isDark ? (
               <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
             ) : (
@@ -1831,6 +1831,7 @@ export default function Home() {
             <div className="p-period">One-time · 5-day delivery</div>
             <div className="p-tagline">
               Perfect for clinics, shops & coaches just getting online.
+              <div style={{ marginTop: '8px', fontSize: '11px', fontWeight: 600, color: 'var(--indigo)' }}>* 5-day clock starts after content received</div>
             </div>
             <ul className="p-features">
               <li>
@@ -1889,7 +1890,7 @@ export default function Home() {
           <article className="p-card reveal-up" style={{ transitionDelay: '0.3s' }}>
             <div className="p-plan">Pro</div>
             <div className="p-price">₹12,999</div>
-            <div className="p-period">One-time · 10-day delivery</div>
+            <div className="p-period">One-time · 7-day delivery</div>
             <div className="p-tagline">
               AI-powered, fully automated, built to convert.
             </div>
@@ -1910,7 +1911,10 @@ export default function Home() {
                 <span className="p-check" aria-hidden="true">✓</span>Lead capture system
               </li>
               <li>
-                <span className="p-check" aria-hidden="true">✓</span>Unlimited revisions
+                <span className="p-check" aria-hidden="true">✓</span>3 rounds + 1 post-launch revision
+              </li>
+              <li>
+                <span className="p-check" aria-hidden="true">✓</span>Priority support during build
               </li>
             </ul>
             <button onClick={() => setActiveModal('contact')} className="p-btn" aria-label="Get Started with Pro Plan">Get Started</button>
