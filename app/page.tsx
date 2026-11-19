@@ -2384,7 +2384,12 @@ export default function Home() {
       .nav-right { gap: 10px; }
       .mobile-menu-btn { display: flex; }
       .logo { font-size: 18px; }
-      .nav-cta { padding: 8px 14px; font-size: 12px !important; }
+      nav .nav-cta {
+        padding: 8px 12px;
+        font-size: 12px !important;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
       
       .services-grid, .portfolio-grid, .pricing-grid, .faq-grid { grid-template-columns: 1fr; }
       .section-header-split { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 40px; }
