@@ -1965,59 +1965,6 @@ export default function Home() {
       gap: 16px;
       box-shadow: 0 10px 30px var(--card-shadow);
     }
-    .udyam-proof-card {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-top: 22px;
-      padding: 20px 24px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: var(--card-bg);
-      box-shadow: 0 10px 30px var(--card-shadow);
-    }
-    .udyam-proof-icon {
-      width: 42px;
-      height: 42px;
-      flex: 0 0 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 14px;
-      background: var(--indigo-glow);
-      color: var(--indigo);
-      font-size: 20px;
-      font-weight: 800;
-    }
-    .udyam-proof-copy {
-      flex: 1 1 260px;
-    }
-    .udyam-proof-title {
-      margin: 0 0 4px;
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 800;
-    }
-    .udyam-proof-description {
-      margin: 0;
-      color: var(--text-muted);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .udyam-proof-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--indigo);
-      font-size: 14px;
-      font-weight: 700;
-      text-decoration: none;
-    }
-    .udyam-proof-link:hover {
-      text-decoration: underline;
-    }
-
     @media (max-width: 900px) {
       .trust-metrics-strip {
         grid-template-columns: repeat(2, 1fr);
@@ -2048,12 +1995,6 @@ export default function Home() {
       .trust-cta-bar .btn-primary {
         width: 100%;
         justify-content: center;
-      }
-      .udyam-proof-card {
-        padding: 18px;
-      }
-      .udyam-proof-link {
-        margin-left: 58px;
       }
     }
 
@@ -3739,25 +3680,6 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="udyam-proof-card reveal-up">
-            <div className="udyam-proof-icon" aria-hidden="true">✓</div>
-            <div className="udyam-proof-copy">
-              <h3 className="udyam-proof-title">Udyam Registered</h3>
-              <p className="udyam-proof-description">
-                Our Udyam Registration Certificate is available for verification.
-              </p>
-            </div>
-            <a
-              className="udyam-proof-link"
-              href="/udyam-registration-certificate.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View Udyam Registration Certificate PDF"
-            >
-              View certificate <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-
           <div className="trust-cta-bar reveal-up">
             <div style={{ fontSize: '14px', color: 'var(--text-muted)', fontWeight: 500 }}>
               <strong style={{ color: 'var(--text)' }}>100% Code Ownership. Zero lock-in.</strong> Ready to launch in 7 days?
@@ -4104,6 +4026,20 @@ export default function Home() {
                   
                   <h3>5. Intellectual Property</h3>
                   <p>Upon final payment, full ownership of the custom website codebase and associated intellectual property is transferred to the client. WebAgen Studio retains the right to showcase the completed project in our portfolio.</p>
+
+                  <h3>6. Business Registration</h3>
+                  <p>
+                    View the{' '}
+                    <a
+                      href="/udyam-registration-certificate.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: 'var(--indigo)', fontWeight: 600 }}
+                    >
+                      Udyam Registration Certificate (PDF)
+                    </a>{' '}
+                    for registration details.
+                  </p>
                 </div>
               </>
             )}
