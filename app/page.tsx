@@ -288,8 +288,8 @@ export default function Home() {
       accent: '#818CF8',
       accentBg: 'rgba(99,102,241,0.12)',
       title: 'Eduvo AI',
-      liveUrl: 'https://www.eduvoai.com',
-      domainLabel: 'eduvoai.com',
+      liveUrl: 'https://eduvo-ai.vercel.app/',
+      domainLabel: 'eduvo-ai.vercel.app',
       tagline: 'A free, Gemini-powered career guidance and skill-building platform aimed at helping students become genuinely job-ready through hands-on engineering and personalized AI tools.',
       problem: 'Graduates and aspiring developers often struggle with generic tutorials, unclear learning paths, and resumes that fail Applicant Tracking Systems (ATS)—leaving a huge gap between academic study and real-world software engineering jobs.',
       solution: 'We engineered a comprehensive Next.js and Gemini AI platform combining a live multi-file coding IDE (Eduvo Forge), personalized career roadmaps, and an ATS resume & interview analyzer (CV Matcher Pro) into one cohesive experience.',
@@ -2415,7 +2415,18 @@ export default function Home() {
       .cta-final { padding: 80px 24px 32px; border-radius: 32px 32px 0 0; margin-top: 40px; }
       .cta-title { font-size: 32px !important; margin-bottom: 32px; }
       .cta-footer { margin-top: 40px; padding-top: 40px; }
-      .cta-footer-bottom { flex-direction: column; gap: 16px; text-align: center;}
+      .cta-footer { padding-bottom: 88px; }
+      .cta-footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .cta-footer-links {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px 20px;
+      }
+      .cta-footer-links a,
+      .cta-footer-links button {
+        white-space: nowrap;
+      }
       
       .ai-fab { bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 16px; }
       .chat-window { position: fixed; inset: 0; width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; z-index: 10000; transform: translateY(100%); }
@@ -2627,7 +2638,7 @@ export default function Home() {
                     "@type": "ListItem",
                     "position": 1,
                     "name": "Eduvo AI — Free Gemini-Powered Career & Coding Platform",
-                    "url": "https://www.eduvoai.com"
+                    "url": "https://eduvo-ai.vercel.app/"
                   },
                   {
                     "@type": "ListItem",
@@ -3260,14 +3271,14 @@ export default function Home() {
         <div className="portfolio-grid">
           {/* Project 1: Eduvo AI */}
           <div className="port-card reveal-up" style={{ transitionDelay: '0s' }}>
-            <a href="https://www.eduvoai.com" target="_blank" rel="noreferrer" className="port-visual" aria-label="Open Eduvo AI live website">
+            <a href={CASE_STUDIES.eduvo.liveUrl} target="_blank" rel="noopener noreferrer" className="port-visual" aria-label="Open Eduvo AI live website">
               <div className="mock-browser-bar mini">
                 <div className="flex gap-1.5 absolute left-3">
                   <div className="w-2 h-2 rounded-full bg-rose-400/90"></div>
                   <div className="w-2 h-2 rounded-full bg-amber-400/90"></div>
                   <div className="w-2 h-2 rounded-full bg-emerald-400/90"></div>
                 </div>
-                <div className="mock-url-bar mini">eduvoai.com ↗</div>
+                <div className="mock-url-bar mini">eduvo-ai.vercel.app ↗</div>
               </div>
               <div className="port-visual-body">
                 <div className="port-visual-grid"></div>
@@ -3288,7 +3299,7 @@ export default function Home() {
                   View Case Study →
                 </button>
                 <div className="port-links-row">
-                  <a href="https://www.eduvoai.com" target="_blank" rel="noreferrer" className="port-visit-link">
+                  <a href={CASE_STUDIES.eduvo.liveUrl} target="_blank" rel="noopener noreferrer" className="port-visit-link">
                     Live Site ↗
                   </a>
                 </div>
